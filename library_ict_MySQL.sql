@@ -194,3 +194,18 @@ JOIN room_type rt ON r.room_type_id = rt.room_type_id
 LEFT JOIN computer_set cs ON cs.room_id = r.room_id
 LEFT JOIN printer p ON p.room_id = r.room_id
 GROUP BY l.library_name, r.room_name, rt.type_name;
+
+CREATE TABLE users (
+    user_id         INT AUTO_INCREMENT PRIMARY KEY,
+    username        VARCHAR(50) NOT NULL UNIQUE,
+    hashed_password VARCHAR(255) NOT NULL,
+    role            ENUM('admin','user') NOT NULL,
+    created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+ALTER TABLE maintenance_log
+DROP COLUMN reported_by,
+ADD COLUMN reported_by_user_id INT NULL,
+ADD CONSTRAINT fk_log_reported_by
+    FOREIGN KEY (reported_by_user_id) REFERENCES users(user_id)
+    ON DELETE SET NULL;
