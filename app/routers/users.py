@@ -5,13 +5,13 @@ from app.database import get_db
 from typing import Annotated
 from sqlalchemy.orm import Session
 from app.crud import get_user_by_username, create_user, get_users, update_user, delete_user
-from app.auth import verify_password, create_access_token, get_current_admin
+from app.auth import verify_password, create_access_token, get_current_admin, get_current_user
 from app.models import User
 
 router = APIRouter(tags=["users"])
 
 @router.post("/register", response_model=UserOut)
-def register(user: UserCreate, db: Annotated[Session, Depends(get_db)]):
+def register(user: UserCreate, db: Annotated[Session, Depends(get_db)], current_user: Annotated[User, Depends(get_current_admin)]):
     existing_user = get_user_by_username(db, user.username)
     if existing_user:
         raise HTTPException(status_code=400, detail="username is already taken")
@@ -28,6 +28,18 @@ def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], db: Annota
 @router.get("/users", response_model=list[UserOut])
 def list_users(db: Annotated[Session, Depends(get_db)], admin=Depends(get_current_admin)):
     return get_users(db)
+
+@router.get("/users/me", response_model=UserOut)
+def read_own_profile(current_user: Annotated[User, Depends(get_current_user)]):
+    return current_user
+
+@router.put("/users/me", response_model=UserOut)
+def edit_own_profile(
+    user: UserUpdate,
+    current_user: Annotated[User, Depends(get_current_user)],
+    db: Annotated[Session, Depends(get_db)],
+):
+    return update_user(db, current_user.username, user)  # type: ignore
 
 @router.get("/users/{username}",response_model=UserOut)
 def read_user(username: str, db: Annotated[Session, Depends(get_db)], admin=Depends(get_current_admin)):
@@ -49,6 +61,8 @@ def remove_user(username: str, db: Annotated[Session, Depends(get_db)], admin=De
     if deleted is None:
         raise HTTPException(status_code=404, detail="User not found")
     return{"message":"User deleted"}
+
+
             
         
 

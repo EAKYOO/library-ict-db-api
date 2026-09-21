@@ -21,7 +21,7 @@ def read_maintenance_log(log_id: int, db: Annotated[Session, Depends(get_db)], c
 
 @router.post("/", response_model=MaintenanceLogOut)
 def add_maintenance_log(maintenance_log: MaintenanceLogCreate, db: Annotated[Session, Depends(get_db)], current_user=Depends(get_current_user)):
-    return create_log(db,maintenance_log)
+    return create_log(db,maintenance_log,current_user.user_id)  # type: ignore
 
 @router.put("/{log_id}", response_model=MaintenanceLogOut)
 def edit_maintenance_log(log_id: int, maintenance_log: MaintenanceLogCreate, db: Annotated[Session, Depends(get_db)], admin=Depends(get_current_admin)):

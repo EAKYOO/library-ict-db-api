@@ -177,13 +177,13 @@ class MaintenanceLogBase(BaseModel):
     date_resolved: date | None = None
     action_taken: str | None = None
     resolved_status_id: int | None = None
-    reported_by_user_id: int | None = None
 
 class MaintenanceLogCreate(MaintenanceLogBase):
     pass
 
 class MaintenanceLogOut(MaintenanceLogBase):
     log_id: int
+    reported_by_user_id: int | None = None
 
     class Config:
         from_attributes = True

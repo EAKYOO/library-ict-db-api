@@ -15,6 +15,7 @@ load_dotenv()
 SECRET_KEY: str = os.environ["SECRET_KEY"]
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60
+PASSWORD_RESET_EXPIRE_MINUTES = 15
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -62,6 +63,5 @@ def get_current_admin(current_user: Annotated[User,Depends(get_current_user)]):
     )
     return current_user
 
-            
 
         

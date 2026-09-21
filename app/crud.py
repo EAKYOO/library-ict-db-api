@@ -339,8 +339,19 @@ def get_logs(db: Session):
 def get_log(db: Session, log_id: int):
     return db.query(MaintenanceLog).filter(MaintenanceLog.log_id == log_id).first()
 
-def create_log(db: Session, log: MaintenanceLogCreate): 
-    new_log = MaintenanceLog(**log.model_dump())
+def create_log(db: Session, log: MaintenanceLogCreate, reported_by_user_id: int):
+    item_exists = False
+    if log.item_type == "Computer":
+        item_exists = db.query(ComputerSet).filter(ComputerSet.computer_id == log.item_id).first() is not None
+    elif log.item_type == "Component":
+        item_exists = db.query(Component).filter(Component.component_id == log.item_id).first() is not None
+    elif log.item_type == "Printer":
+        item_exists = db.query(Printer).filter(Printer.printer_id == log.item_id).first() is not None
+
+    if not item_exists:
+        raise HTTPException(status_code=400, detail=f"{log.item_type} with id {log.item_id} does not exist")
+
+    new_log = MaintenanceLog(**log.model_dump(), reported_by_user_id=reported_by_user_id)
     db.add(new_log)
     db.commit()
     db.refresh(new_log)
@@ -363,4 +374,3 @@ def delete_log(db: Session, log_id: int):
     db.delete(log)
     db.commit()
     return log 
-
