@@ -4,6 +4,7 @@ from app.models import User, Library, RoomType, Status, ComponentType, ComputerT
 from app.schemas import UserCreate, LibraryCreate, RoomTypeCreate, StatusCreate, ComponentTypeCreate, ComputerTypeCreate, RoomCreate, ComputerSetCreate, ComponentCreate, PrinterCreate, MaintenanceLogCreate, UserUpdate
 from app.auth import hash_password
 
+#dealing user crud
 def get_user_by_username(db:Session , username: str):
     return db.query(User).filter(User.username == username).first()
 
@@ -33,6 +34,15 @@ def update_user(db: Session, username: str, user: UserUpdate):
     db.commit()
     db.refresh(db_user)
     return db_user
+
+def update_user_role(db: Session, username: str, role: str):
+    user = get_user_by_username(db, username)
+    if user is None:
+        return None
+    user.role = role
+    db.commit()
+    db.refresh(user)
+    return user
 
 def delete_user(db: Session, username: str):
     user_to_delete = get_user_by_username(db,username)

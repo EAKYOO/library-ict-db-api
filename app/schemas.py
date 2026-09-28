@@ -88,6 +88,9 @@ class UserOut(UserBase):
     class Config:
         from_attributes = True
 
+class UserRoleUpdate(BaseModel):
+    role: Literal["admin", "user"]
+
 #dealing room schema
 class RoomBase(BaseModel):
     room_name: str
@@ -112,6 +115,7 @@ class ComputerSetBase(BaseModel):
     serial_number: str | None = None
     brand: str | None = None
     model: str | None = None
+    status_id: int | None = None
     purchase_date: date | None = None
     remarks: str | None = None
 

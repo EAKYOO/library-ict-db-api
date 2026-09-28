@@ -26,6 +26,7 @@ class Status(Base):
     status_name = Column(String(30), nullable=False, unique=True)
     component = relationship("Component", back_populates="status")
     printer = relationship("Printer", back_populates="status")
+    computer = relationship("ComputerSet", back_populates="status")
     maintenance_log = relationship("MaintenanceLog", back_populates="status")
 
 class ComponentType(Base):
@@ -76,11 +77,13 @@ class ComputerSet(Base):
     serial_number = Column(String(50), nullable=True, unique=True)
     brand = Column(String(50), nullable=True)
     model = Column(String(50), nullable=True)
+    status_id = Column(Integer, ForeignKey("status.status_id"), nullable=True)
     purchase_date = Column(Date, nullable=True)
     date_added = Column(Date, server_default=func.current_date())
     remarks = Column(String(255), nullable=True)
     room = relationship("Room", back_populates="computer_sets")
     component = relationship("Component", back_populates="computer_set")
+    status = relationship("Status", back_populates="computer")
 
 class Component(Base):
     __tablename__ = "component"
